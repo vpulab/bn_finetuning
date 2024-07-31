@@ -1,0 +1,36 @@
+program: wandb_sweep.py
+project: ISIC-2019 SwAV sweep (from RL with KD on RL)
+method: random
+
+parameters:
+  batch_size:
+    values: [64,]
+  lr:
+    # distribution: log_uniform_values
+    distribution: uniform
+    # min: 0.01
+    min: 0.1
+    max: 2.0
+  # batch_size:
+  #     value: 32
+  # lr:
+  #     value: 0.4891871281284309
+
+command:
+  - python3
+  - "-m"
+  - "torch.distributed.launch"
+  - "--nproc_per_node=1"
+  - "--master_port=29530"
+  - ${program}
+  - /home/kis/code/mmselfsup/configs/selfsup/swav_kd_rl/swav_resnet50_isic2019_KD_on_rl.py
+  - "--work_dir"
+  - "../work_dirs/isic_2019_ssl/wandb_sweeps/swav_from_RL_KD_on_RL"
+  - "--cfg-options"
+  - "load_from=/home/kis/code/mmselfsup/work_dirs/isic_2019_ssl/resnet50_from_imagenet/relative_loc_lr_0.2057_bsize512_200ep_data_split_1_from_imagenet_sup/epoch_200.pth"
+  - "--seed"
+  - "0"
+  - "--launcher"
+  - "pytorch"
+  - "--cifar"
+  - "0"

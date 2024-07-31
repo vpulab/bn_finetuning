@@ -1,0 +1,36 @@
+program: wandb_sweep.py
+project: ISIC-2019 SwAV sweep (from supervised ImageNet) - 2
+method: random
+
+parameters:
+  batch_size:
+    values: [32,]
+  lr:
+    # distribution: log_uniform_values
+    distribution: uniform
+    # min: 0.01
+    min: 0.6
+    max: 2.0
+  # batch_size:
+  #     value: 32
+  # lr:
+  #     value: 0.4891871281284309
+
+command:
+  - python3
+  - "-m"
+  - "torch.distributed.launch"
+  - "--nproc_per_node=1"
+  - "--master_port=29547"
+  - ${program}
+  - /home/kis/code/mmselfsup/configs/selfsup/swav/swav_resnet50_8xb32-mcrop-2-6-coslr-200e_isic2019-224-96-queue256_shades_of_gray_optimal_from_sup.py
+  - "--work_dir"
+  - "../work_dirs/isic_2019_ssl/wandb_sweeps/swav_from_supervised_imagenet"
+  - "--cfg-options"
+  - "load_from=/home/kis/code/mmselfsup/pretrained_models/imagenet_r50-backbone.pth"
+  - "--seed"
+  - "0"
+  - "--launcher"
+  - "pytorch"
+  - "--cifar"
+  - "0"
