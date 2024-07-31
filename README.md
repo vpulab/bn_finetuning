@@ -10,4 +10,90 @@ end-to-end finetuned performance, (ii) improves the linear probing performance i
 
 In this work we demonstrate the benefits of finetuning BN affines during SSL linear probing in many- and few-shot regimes. Specifically, in the many-shot setup we train 12 SSL models and compare obtained results to standard linear probing and end-to-end finetuning. We use few-shot learning benchmark datasets to further show that BN finetuning is advantageous for SSL model evaluation in scenarios with limited training data and strong domain shifts. 
 
-To replicate the experiments in the paper, first properly install the environment:
+To replicate the experiments in the paper you will need to install the environment, download the data and the pretrained models.
+
+### Environment
+
+This project is based on the mmselfsup framework. Please refer to [install.md](docs/en/install.md) for installation and [prepare_data.md](docs/en/prepare_data.md) for dataset preparation.
+
+[//]: # (- Use Python==3.8, PyTorch==1.7.1, torchvision==0.9.1)
+
+If that doesn't work, try this:
+
+    conda create -n openmmlab python=3.7 -y
+    conda activate openmmlab
+    conda install pytorch==1.7.1 torchvision==0.8.2 cudatoolkit=10.1 -c pytorch -y
+    pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu101/torch1.7/index.html
+    pip install mmcls
+
+Change directory to the cloned repository (this one, not the official one): 
+    
+    cd mmselfsup
+
+Finally, run:
+
+    pip install -v -e .
+
+
+When installing mmselfsup following [install.md](docs/en/install.md), don't clone the official mmselfsup repository at step 3. Instead use this one.
+
+Then install the remaining missing packages from environment.yml.
+
+### Datasets
+Download the following datasets and place them into the ./data directory of the project. The following structure is expected: 
+
+    ./data/DATASET_NAME/IMG_FOLDER_NAME/IMG_0_NAME.***  
+    
+    ./data/DATASET_NAME/IMG_FOLDER_NAME/IMG_1_NAME.***  
+    
+    ./data/DATASET_NAME/IMG_FOLDER_NAME/IMG_2_NAME.***  
+    
+    ...
+
+
+The annotations files are expected to have the following format:
+
+
+
+    IMG_0_NAME CLASS_NUMBER  
+    
+    IMG_1_NAME CLASS_NUMBER
+    
+    IMG_2_NAME CLASS_NUMBER
+    
+    ...
+
+
+
+- DTD (https://www.robots.ox.ac.uk/~vgg/data/dtd/)
+- Caltech-101 (https://data.caltech.edu/records/mzrjq-6wc02)
+- FGVC Aircraft (https://www.robots.ox.ac.uk/~vgg/data/fgvc-aircraft/)
+- Stanford cars (https://www.kaggle.com/datasets/jessicali9530/stanford-cars-dataset - the original URL is broken)
+- Oxford-IIIT Pets (https://www.robots.ox.ac.uk/~vgg/data/pets/)
+- Oxford 102 Flowers (https://www.robots.ox.ac.uk/~vgg/data/flowers/102/)
+- CIFAR-10 (https://www.cs.toronto.edu/~kriz/cifar.html)
+- CIFAR-100 (https://www.cs.toronto.edu/~kriz/cifar.html)
+
+- EuroSAT (https://zenodo.org/records/7711810#.ZAm3k-zMKEA)
+- NIH Chest X-Ray (https://nihcc.app.box.com/v/ChestXray-NIHCC)
+- ISIC-2018 (https://challenge.isic-archive.com/data/#2018)
+- MHIST (https://bmirds.github.io/MHIST/) - requires registration to access the data
+
+### Models
+
+Download the pretrained models from **xxxxxxxx**  and place them in ./pretrained_models/official_weights/mmselfsup_format
+
+### Train the models
+
+To transfer an SSL model with **BN-finetuning** to a downstream dataset (for example, SwAV model to DTD dataset), use the following command:
+
+    python3 tools/train.py ./configs/benchmarks/classification/dtd/resnet50_train_bn.py --work_dir ./work_dirs/dtd_train_bn/swav --cfg-options load_from=./pretrained_models/official_weights/mmselfsup_format/swav_backbone.pth --split 0 --wandb_project "DTD Train BN" --linear True --wandb_run_name "SwAV, split 0"
+
+To transfer an SSL model with **linear probing** to a downstream dataset (for example, SwAV model to DTD dataset), use the following command:
+
+    python3 tools/train.py ./configs/benchmarks/classification/dtd/resnet50.py --work_dir ./work_dirs/dtd_train_linear/swav --cfg-options load_from=./pretrained_models/official_weights/mmselfsup_format/swav_backbone.pth --split 0 --wandb_project "DTD Linear" --linear True --wandb_run_name "SwAV, split 0"
+
+To train the models in the few-shot regime, please refer to https://github.com/linusericsson/ssl-transfer/blob/main/few_shot.py
+
+
+ 
